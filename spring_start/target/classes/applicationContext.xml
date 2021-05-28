@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
+<!--    <import resource="druidDataSource.xml"></import>-->
+
+    <import resource="druidDataSource.xml"></import>
+
+    <bean id="car" class="com.zyj.bean.Car"></bean>
+
+    <!-- DI 依赖注入的方式：set 方法注入 -->
+    <bean id="car1" class="com.zyj.bean.Car">
+        <property name="name" value="奔驰"/>
+        <property name="price" value="200"/>
+        <property name="id" value="001"/>
+    </bean>
+
+    <!-- DI 依赖注入的方式：构造器的方式 -->
+    <bean id="car2" class="com.zyj.bean.Car">
+        <constructor-arg value="002" name="id"/>
+        <constructor-arg value="宝马" name="name"/>
+        <constructor-arg value="150000" name="price"/>
+    </bean>
+    <bean id="car3" class="com.zyj.bean.Car">
+        <constructor-arg value="红旗" name="name" index="1"/>
+        <constructor-arg value="003" name="id" index="0"/>
+        <constructor-arg value="150000" name="price" index="2"/>
+    </bean>
+
+    <!-- 使用 p 命名空间的语法来配置 bean，底层依旧是 set 风格-->
+    <bean id="car4" class="com.zyj.bean.Car"
+          p:id="004" p:name="比亚迪" p:price="10000">
+    </bean>
+
+    <!--
+        字面量：
+            特殊字符：
+                1. 使用实体(转义)
+                    &nbsp;
+                    &:&amp;
+                    <:&lt;
+                    >:&gt;
+                2. 使用 cdata 标签 <![CDATA[任意字符]]>
+    -->
+    <bean id="book" class="com.zyj.bean.Book">
+        <property name="id" value="1001"/>
+        <property name="name">
+            <value><![CDATA[大碗牛肉]]></value>
+        </property>
+    </bean>
+
+    <!-- 引用其他的 bean 对象 -->
+    <bean id="person" class="com.zyj.bean.Person">
+        <property name="id" value="001"/>
+        <property name="name" value="老王"/>
+        <property name="car" ref="car"/>
+
+        <!-- 给级联属性赋值(了解)    修改之后原对象的值也会被修改，其他对象再调用也是修改后的值 -->
+        <property name="car.name" value="丰田"/>
+    </bean>
+
+    <!-- 内部 bean -->
+    <bean id="person1" class="com.zyj.bean.Person">
+        <property name="id" value="102"/>
+        <property name="name" value="老黄"/>
+        <property name="car">
+            <!-- 内部 bean 只能在内部使用，则 id 是没必要设置的 -->
+            <bean class="com.zyj.bean.Car">
+                <property name="id" value="1001"/>
+                <property name="name" value="五菱宏光"/>
+                <property name="price" value="20000"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- List 集合 -->
+    <bean id="personList" class="com.zyj.bean.PersonList">
+        <property name="name" value="Tom"/>
+        <property name="car">
+            <list>
+                <!-- 可以使用 <bean> 或者 <ref> 标签来构造集合中的对象 -->
+                <ref bean="car"/>
+                <ref bean="car1"/>
+                <ref bean="car2"/>
+                <ref bean="car3"/>
+                <ref bean="car4"/>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Map 集合 -->
+    <bean id="personMap" class="com.zyj.bean.PersonMap">
+        <property name="name" value="jack"/>
+        <property name="car">
+            <map>
+                <entry key="CarA" value-ref="car1"/>
+                <entry key="CarB" value-ref="car2"/>
+                <entry key="CarC" value-ref="car3"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- 集合 bean (List、Map等)-->
+    <util:list id="listBean">
+        <ref bean="car1"/>
+        <ref bean="car2"/>
+        <ref bean="car3"/>
+    </util:list>
+
+    <!-- 集合 bean 的使用,直接使用 ref 来引用集合 bean -->
+    <bean id="personList2" class="com.zyj.bean.PersonList">
+        <property name="name" value="marry"/>
+        <property name="car" ref="listBean"/>
+    </bean>
+
+    <!-- 通过 FactoryBean 来配置 bean
+            FactoryBean 具体返回的对象是由 getObject 方法来决定的。
+     -->
+    <bean id="carFactoryBean" class="com.zyj.bean.CarFactoryBean"></bean>
+
+
+    <!-- bean 的继承关系
+            parent: 指向父类
+            abstract = "true": 抽象 bean，不能被创建，所以 class 没必要配置
+            继承可以从父 bean 中继承一些配置，但是 id、abstract、autowire 是不能被继承下来的
+    -->
+    <bean id="address1" abstract="true">
+        <property name="city" value="Beijing"/>
+        <property name="street" value="WuDaoKou"/>
+    </bean>
+
+    <bean id="address2" class="com.zyj.bean.Address" parent="address1">
+        <property name="street" value="ChangAnJie"/>
+<!--        <property name="city" value="BeiJing"/>-->
+    </bean>
+
+    <!-- 依赖关系 -->
+    <bean id="address3" class="com.zyj.bean.Address"
+          parent="address1" depends-on="address4">
+    </bean>
+    <bean id="address4" class="com.zyj.bean.Address"></bean>
+
+
+    <!-- 配置数据源 -->
+    <context:property-placeholder location="db.properties"></context:property-placeholder>
+    <!-- c3p0连接池 -->
+    <bean id="datasource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.Driver}"/>
+        <property name="jdbcUrl" value="${jdbc.url}"/>
+        <property name="user" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="initialPoolSize" value="50"/>
+        <property name="maxPoolSize" value="100"/>
+    </bean>
+</beans>
