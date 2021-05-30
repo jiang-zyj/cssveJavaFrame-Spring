@@ -11,6 +11,7 @@
     <modules>
         <module>spring_annotation</module>
         <module>spring_start</module>
+        <module>spring_aop</module>
     </modules>
 
     <dependencies>

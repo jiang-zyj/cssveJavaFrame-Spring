@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="spring_annotation" />
         <module name="spring_start" />
+        <module name="spring_aop" />
       </profile>
     </annotationProcessing>
   </component>

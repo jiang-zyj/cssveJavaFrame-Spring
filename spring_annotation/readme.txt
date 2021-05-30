@@ -29,6 +29,15 @@ Spring中注解【原生】
 @PreDestroy
     放在方法头部，用于销毁 bean 时做操作
 
+@Configuration
+    表明该类是一个配置类
+
+@ComponentScan
+    扫描包
+
+@Import()
+    用于引入配置类对象
+
 @RunWith(SpringJunit4ClassRunner.class)
     让一个类变为一个做单元测试的类,通常用于测试类
 

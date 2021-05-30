@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+
+    <!--
+        使用 jdk 和 cglib 来创建动态代理对象的区别：
+            如果配置的目标对象是通过接口来实现的，那么会自动使用 jdk 动态代理
+            如果配置的目标对象是通过普通类来实现的，那么就会自动使用 cglib 动态代理创建代理对象
+     -->
+    <!-- jdk 配置目标对象 -->
+    <bean id="userMapper" class="com.zyj.proxy.aspectJ.xml.UserMapperImpl"></bean>
+
+    <!-- cglib 配置目标对象 -->
+    <bean id="studentDao" class="com.zyj.proxy.aspectJ.xml.StudentDaoImpl"></bean>
+
+    <!-- 配置切面对象 -->
+    <bean id="myAspect" class="com.zyj.proxy.aspectJ.xml.MyAspect"></bean>
+
+    <!-- 配置织入【动词】哪些方法需要被增强 -->
+    <aop:config>
+        <aop:pointcut id="myPointcut" expression="execution(* com.zyj.proxy.aspectJ.xml.*.*(..))"/>
+        <!-- 配置【声明切面】 -->
+        <aop:aspect ref="myAspect">
+            <!-- 切面【切入点 + 通知】 -->
+            <aop:before method="beforeLog" pointcut="execution(* com.zyj.proxy.aspectJ.xml.*.*(..))"></aop:before>
+            <aop:after method="afterLog" pointcut-ref="myPointcut"></aop:after>
+            <aop:after-returning method="afterReturnMethod" pointcut-ref="myPointcut" returning="result"></aop:after-returning>
+            <aop:after-throwing method="afterThrowingMethod" throwing="ex" pointcut-ref="myPointcut"></aop:after-throwing>
+        </aop:aspect>
+
+    </aop:config>
+
+</beans>
